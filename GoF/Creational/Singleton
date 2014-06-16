@@ -1,0 +1,78 @@
+Файл Singleton.h
+#pragma once
+#ifndef SINGLETON_H
+#define SINGLETON_H
+#include <string>
+#include <fstream>
+#include <ctime>
+
+using namespace std;
+
+class Logger
+{
+  private:
+    static Logger * instance;
+//запрещаем все конструкторы, для невозможности создания объекта вне метода getInstance()
+    Logger() {} //конструктор
+    Logger( const Logger& ); //конструктор копирования
+    Logger& operator=( Logger& );//оператор присваивания
+  public:
+	  //метод, возвращающий указатель на единственный объект типа Logger
+    static Logger * getInstance() {
+        if(!instance)           
+            instance = new Logger();
+        return instance;
+    }
+	bool logError(string mes);
+};
+
+
+ 
+#endif SINGLETON_H
+
+ 
+Файл Singleton.cpp
+#pragma once
+
+#include "Singleton.h"
+
+//инициализация указателя
+Logger * Logger::instance = 0;
+//метод логирования ошибки
+//возвращает true , если событие записано, иначе false
+bool Logger::logError(string mes)
+{
+	ofstream out;
+	out.open("log.dat", ios::app);
+	if (out.is_open())
+	{
+		time_t t;
+		time(&t);
+		out << "Time: " <<  ctime(&t) << "Error: " << mes << endl;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+ 
+Файл main.cpp
+#include "Singleton.h"
+
+
+
+
+int main()
+{
+	//присваиваем указатель на объект класса Logger,возвращаемый статическим методом getInstance()
+	Logger * logger = Logger::getInstance();
+
+	//пример использования класса Logger: отправка соощения об ошибке
+	logger->logError("Object Skeleton not loaded");
+	logger->logError("Object Boss is immortal =(");
+
+	Logger::getInstance()->logError("...");
+
+	return 0;
+}
